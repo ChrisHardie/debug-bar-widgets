@@ -33,72 +33,76 @@ if ( ! function_exists( 'debug_bar_widgets_has_parent_plugin' ) ) {
 	add_action( 'admin_init', 'debug_bar_widgets_has_parent_plugin' );
 }
 
-add_filter( 'debug_bar_panels', 'debug_bar_widgets_init' );
- 
-/**
- * Initialize widgets debug panel
- * Adapted from https://www.yukei.net/2015/01/adding-a-new-panel-to-the-wordpress-debug-bar-plugin/
- *
- * @param array $panels Debug bar panels objects
- * @return array Debug bar panel for registered widgets
- */
-function debug_bar_widgets_init( $panels ) {
+if ( ! function_exists( 'debug_bar_widgets_init' ) ) {
+	/**
+	 * Initialize widgets debug panel
+	 * Adapted from https://www.yukei.net/2015/01/adding-a-new-panel-to-the-wordpress-debug-bar-plugin/
+	 *
+	 * @param array $panels Debug bar panels objects
+	 *
+	 * @return array Debug bar panel for registered widgets
+	 */
+	function debug_bar_widgets_init( $panels ) {
 
-	class Debug_Bar_Widgets extends Debug_Bar_Panel{
+		class Debug_Bar_Widgets extends Debug_Bar_Panel {
 
-		public function init(){
+			public function init() {
 
-			$this->title( __( 'Registered Widgets', 'debug-bar-widgets' ) );
-		}
+				$this->title( __( 'Registered Widgets', 'debug-bar-widgets' ) );
+			}
 
-		public function render(){
+			public function render() {
 
-			$output = '';
+				$output = '';
 
-			$widgets = get_widget_classes();
+				$widgets = _get_widget_classes();
 
-			if ( is_array( $widgets ) && ( 0 < count( $widgets ) ) ) {
+				if ( is_array( $widgets ) && ( 0 < count( $widgets ) ) ) {
 
-				$output .= '<div id="debug-bar-widgets"><strong><p>';
-				$output .= __( 'Registered Widgets:', 'debug-bar-widgets' );
-				$output .= '</strong></p><ul>';
+					$output .= '<div id="debug-bar-widgets"><strong><p>';
+					$output .= __( 'Registered Widgets:', 'debug-bar-widgets' );
+					$output .= '</strong></p><ul>';
 
-				foreach ( $widgets as $widget_title => $widget_class ) {
+					foreach ( $widgets as $widget_title => $widget_class ) {
 
-					$widget_name = $widget_class->name;
-					$widget_description = $widget_class->widget_options['description'];
+						$widget_name        = $widget_class->name;
+						$widget_description = $widget_class->widget_options['description'];
 
-					$output .= sprintf( "<li>%s: %s (%s)</li>",
-						esc_html( $widget_title ),
-						esc_html( $widget_name ),
-						esc_html( $widget_description ) );
+						$output .= sprintf( "<li>%s: %s (%s)</li>",
+							esc_html( $widget_title ),
+							esc_html( $widget_name ),
+							esc_html( $widget_description ) );
+					}
+
+					$output .= '</ul></div>';
+
+				} else {
+
+					$output .= __( 'No widgets registered for this site.', 'debug-bar-widgets' );
+
 				}
 
-				$output .= '</ul></div>';
-
-			} else {
-
-				$output .= __( 'No widgets registered for this site.', 'debug-bar-widgets' );
+				echo $output;
 
 			}
 
-			echo $output;
-
 		}
 
+		$panels[] = new Debug_Bar_Widgets();
+
+		return $panels;
 	}
 
-	$panels[] = new Debug_Bar_Widgets();
-	return $panels;
-}
+	add_filter( 'debug_bar_panels', 'debug_bar_widgets_init' );
 
+}
 
 /**
  * Get all registered widgets and return the callback information
  *
  * @return array    Registered widgets
  */
-function get_widget_classes() {
+function _get_widget_classes() {
 
 	global $wp_registered_widgets;
 
