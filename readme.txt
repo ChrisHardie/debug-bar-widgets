@@ -2,8 +2,8 @@
 Contributors: chrishardie
 Tags: debugging,debug-bar,widgets
 Requires at least: 3.0.1
-Tested up to: 4.7
-Version: 1.0
+Tested up to: 4.9
+Version: 1.1
 Stable tag: trunk
 License: GPL2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -27,6 +27,12 @@ Want to help make this plugin better? [Pull requests are welcome](https://github
 3. When viewing the Debug Bar overlay, select the "Registered Widgets" panel
 
 == Changelog ==
+
+= 1.1 =
+
+* Improvement: Remove use of deprecated create_function
+* Improvement: Miscellaneous code cleanup
+* Tested against 4.9
 
 = 1.0 =
 

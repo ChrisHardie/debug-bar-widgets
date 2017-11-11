@@ -4,7 +4,7 @@
  * Plugin Name:       Debug Bar Widgets
  * Plugin URI:        https://github.com/ChrisHardie/debug-bar-widgets
  * Description:       Add a debug bar panel to display registered widgets
- * Version:           1.0.0
+ * Version:           1.1.0
  * Author:            Chris Hardie
  * Author URI:        https://chrishardie.com/
  * License:           GPL-2.0+
@@ -12,7 +12,7 @@
  * Text Domain:       debug-bar-widgets
  */
 
-defined( 'ABSPATH' ) or die( "Please don't try to run this file directly." );
+defined( 'ABSPATH' ) || die( "Please don't try to run this file directly." );
 
 if ( ! function_exists( 'debug_bar_widgets_has_parent_plugin' ) ) {
 	/**
@@ -21,10 +21,11 @@ if ( ! function_exists( 'debug_bar_widgets_has_parent_plugin' ) ) {
 	 */
 	function debug_bar_widgets_has_parent_plugin() {
 		if ( is_admin() && ( ! class_exists( 'Debug_Bar' ) && current_user_can( 'activate_plugins' ) ) ) {
-			add_action( 'admin_notices', create_function( null,
-				'echo \'<div class="error"><p>\' . sprintf( __( \'Activation failed: Debug Bar must be activated to use the <strong>Debug Bar Widgets</strong> Plugin. Visit your plugins page to activate.\', \'debug-bar-widgets\' ) ) . \'</p></div>\';' ) );
+
+			add_action( 'admin_notices', 'debug_bar_widgets_admin_notice' );
 
 			deactivate_plugins( plugin_basename( __FILE__ ) );
+
 			if ( isset( $_GET['activate'] ) ) {
 				unset( $_GET['activate'] );
 			}
@@ -68,10 +69,11 @@ if ( ! function_exists( 'debug_bar_widgets_init' ) ) {
 						$widget_name        = $widget_class->name;
 						$widget_description = $widget_class->widget_options['description'];
 
-						$output .= sprintf( "<li>%s: %s (%s)</li>",
+						$output .= sprintf( '<li>%s: %s (%s)</li>',
 							esc_html( $widget_title ),
 							esc_html( $widget_name ),
-							esc_html( $widget_description ) );
+							esc_html( $widget_description )
+						);
 					}
 
 					$output .= '</ul></div>';
@@ -82,7 +84,7 @@ if ( ! function_exists( 'debug_bar_widgets_init' ) ) {
 
 				}
 
-				echo $output;
+				echo wp_kses_post( $output );
 
 			}
 
@@ -112,16 +114,12 @@ function _get_widget_classes() {
 
 		foreach ( $wp_registered_widgets as $widget ) {
 
-			if ( ! empty( $widget['callback'] ) ) {
+			if ( ! empty( $widget['callback'] ) && ! empty( $widget['callback'][0] ) ) {
 
-				if ( ! empty( $widget['callback'][0] ) ) {
+				$class = get_class( $widget['callback'][0] );
 
-					$class = get_class( $widget['callback'][0] );
-
-					if ( ! array_key_exists( $class, $widgets ) ) {
-						$widgets[$class] = $widget['callback'][0];
-					}
-
+				if ( ! array_key_exists( $class, $widgets ) ) {
+					$widgets[ $class ] = $widget['callback'][0];
 				}
 			}
 		}
@@ -129,4 +127,13 @@ function _get_widget_classes() {
 
 	return $widgets;
 
+}
+
+/**
+ * Display an admin notice for when Debug Bar isn't active.
+ */
+function debug_bar_widgets_admin_notice() {
+	echo '<div class="error"><p>'
+		. 'Debug Bar must be activated to use the <strong>Debug Bar Widgets</strong> Plugin. Visit your plugins page to activate.'
+		. '</p></div>';
 }
