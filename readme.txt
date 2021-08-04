@@ -2,7 +2,7 @@
 Contributors: chrishardie
 Tags: debugging,debug-bar,widgets
 Requires at least: 3.0.1
-Tested up to: 5.7
+Tested up to: 5.8
 Version: 1.1.0
 Stable tag: trunk
 License: GPL2
